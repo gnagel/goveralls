@@ -367,6 +367,8 @@ func process() error {
 		jobID = githubRunID
 	} else if gitlabRunID := os.Getenv("CI_PIPELINE_ID"); gitlabRunID != "" {
 		jobID = gitlabRunID
+	} else if buildkiteRunID := os.Getenv("BUILDKITE_BUILD_NUMBER"); buildkiteRunID != "" {
+		jobID = buildkiteRunID
 	}
 
 	if *repotoken == "" && *repotokenfile != "" {
@@ -425,10 +427,14 @@ func process() error {
 		pullRequest = prNumber
 	} else if prNumber := os.Getenv("CI_EXTERNAL_PULL_REQUEST_IID"); prNumber != "" {
 		pullRequest = prNumber
+	} else if prNumber := os.Getenv("BUILDKITE_PULL_REQUEST"); prNumber != "" {
+		pullRequest = prNumber
 	}
 
 	if *service == "" && os.Getenv("TRAVIS_JOB_ID") != "" {
 		*service = "travis-ci"
+	} else if *service == "" && os.Getenv("BUILDKITE") == "true" {
+		*service = "buildkite"
 	}
 
 	sourceFiles, err := getCoverage()
